@@ -5,6 +5,7 @@
 //#define SEEK_SET 0
 using namespace std;
 
+//读取文件字符个数
 int GetFileLength(FILE *fp)
 {
      int length;
@@ -13,7 +14,7 @@ int GetFileLength(FILE *fp)
      fseek(fp,0,SEEK_SET);
      return length;
 }
-
+//把此表文件读入mem内存区，
 int FileRead( FILE * file_fp, char * mem, int read_length)
 {
    FILE *fp;

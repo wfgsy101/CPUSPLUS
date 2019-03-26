@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<iostream>
 using namespace std;
+//转换成整型
 void ConvertElement( char*  element, int* num)
 {
    if(element != NULL)
@@ -9,7 +10,7 @@ void ConvertElement( char*  element, int* num)
    }
 
 }
-
+//转换成字符串
 void ConvertElement( char* element, char* cha)
 {
 
@@ -24,6 +25,7 @@ void ConvertElement( char* element, char* cha)
         *dest_element ='\0';
     }
 }
+//词串分割成各个词语（\t和\n划分），word_list为待分割的文件首地址，用word_points指针指向各个词语的开头，
 void Word_Split( char* word_list, int column_count, char ** word_points)
 {
 
