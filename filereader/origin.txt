@@ -1,0 +1,451 @@
+c++模板实现词表解析
+
+ littlersmall关注
+
+2016.01.29 14:10* 字数369 阅读4133评论3喜欢0
+
+经过简化的需求如下：
+
+请设计并实现一个通用的词表解析读取工具类(一个或者几个class/struct组成)，
+
+解析并读取如下形式的词表：
+
+<col1>\t<col2>\t...\t<coln>
+
+每一行都是一条记录，每一列可能的类型包括
+
+int
+
+float
+
+char *
+
+uint32_t
+
+uint64_t
+
+其他用户自定义类型
+
+每一列的数据中均不包含\t字符，每一行以\n结尾。
+
+1对于非用户自定义类型，封装解析行为；用户自定义类型，调用用户给出的parse函数（从string翻译成用户struct)完成
+
+2 用户能通过某些形式，定制这个词表的结构，指明每一列的类型是什么
+
+3 用户能逐行读取这个词表的信息，即按序读取每一行，然后能解析出这一行中的每一列内容
+
+4 API设计友好，做到自解释
+
+5 代码的可读性和可维护性好
+
+程序一共由5个文件组成，3个头文件，2个实现文件,如下：
+
+1 build_in.h
+
+#ifndef  __BUILD_IN_H_
+
+#define  __BUILD_IN_H_
+
+#include <stdint.h>
+
+namespaceparse
+
+{
+
+   //int type
+
+   intparse(constchar* str, int* result);
+
+   //char* type
+
+   intparse(constchar* str, char* result);
+
+   intparse(constchar* str, float* result);
+
+   intparse(constchar* str, uint32_t* result);
+
+   intparse(constchar* str, uint64_t* result);
+
+}
+
+2 build_in.cpp
+
+#include <stdio.h>
+
+#include <stdint.h>
+
+#include "build_in.h"
+
+namespaceparse
+
+{
+
+   //int type
+
+   intparse(constchar* str, int* result)
+
+   {
+
+        intret = 0;
+
+  
+
+        if(NULL!= str)
+
+        {
+
+            if(1!= sscanf(str, "%d", result))
+
+            {
+
+                ret = 1;
+
+            }
+
+        }
+
+  
+
+        else
+
+        {
+
+            ret = 1;
+
+        }
+
+  
+
+        returnret;
+
+   }
+
+  
+
+   //char* type
+
+   intparse(constchar* str, char* result)
+
+   {
+
+        intret = 0;
+
+  
+
+        if(NULL!= str && NULL!= result)
+
+        {
+
+            constchar* start_str = str;
+
+            char* result_str = result;
+
+  
+
+            while('\t'!= *start_str
+
+                    && '\n'!= *start_str
+
+                    && '\0'!= *start_str
+
+                    && ','!= *start_str)
+
+            {
+
+                *result_str++ = *start_str++;
+
+           }
+
+  
+
+            *result_str = '\0';
+
+        }
+
+  
+
+        else
+
+        {
+
+            ret = 1;
+
+        }
+
+  
+
+        returnret;
+
+   }
+
+}
+
+3 parser.h
+
+#ifndef  __PARSER_H_
+
+#define  __PARSER_H_
+
+#include "build_in.h"
+
+#include "user.h"
+
+#include <stdio.h>
+
+#include <iostream>
+
+namespaceparse
+
+{
+
+   classParser
+
+   {
+
+        staticconstintMAX_COLUMN = 1024;
+
+  
+
+        constchar* column_[MAX_COLUMN];
+
+        intcolumn_num_;
+
+       
+
+        public:
+
+        Parser()
+
+        {
+
+            memset(this,'\0', sizeof(*this));
+
+        }
+
+ 
+
+        intparse_line(constchar* line, constintcolumn_num)
+
+        {
+
+            intret = 0;
+
+            column_num_ = column_num;
+
+ 
+
+            do
+
+            {
+
+                if(NULL== line || column_num <= 0)
+
+                {
+
+                    ret = 1;
+
+                    break;
+
+                }
+
+                intindex = 0;
+
+                for(inti = 0; '\n'!= line[i]; i++)
+
+                {
+
+                    if(0== i)
+
+                    {
+
+                        column_[index++] = &line[i];
+
+                        //printf("%s\n", column_[0]);
+
+                    }
+
+                    elseif('\t'== line[i])
+
+                    {
+
+                        column_[index++] = &line[i+1];
+
+                        //printf("%s\n", column_[index-1]);
+
+                    }
+
+                }
+
+                if(column_num != index)
+
+                {
+
+                    ret = 1;
+
+                    break;
+
+                }
+
+            } while(0);
+
+            returnret;
+
+        };
+
+  
+
+        template<classT>
+
+        intget_column(constintindex,T* result)
+
+        {
+
+            intret = 0;
+
+  
+
+            if(index < column_num_)
+
+            {
+
+                ret = parse(column_[index], result);
+
+            }
+
+  
+
+            else
+
+            {
+
+                ret = 1;
+
+            }
+
+  
+
+            returnret;
+
+        }  
+
+   };
+
+}
+
+4 user.h
+
+#ifndef  __USER_H_
+
+#define  __USER_H_
+
+#include <stdio.h>
+
+namespaceparse
+
+{
+
+   //example
+
+   typedefstructMyStruct
+
+   {
+
+        inta;
+
+        intb;
+
+        intc;
+
+   }MyStruct;
+
+  
+
+   intparse(constchar* str, MyStruct* result);
+
+}
+
+5 user.cpp
+
+#include "user.h"
+
+namespaceparse
+
+{
+
+   //对于用户类型，请自定义解析实现
+
+   intparse(constchar* str, MyStruct* result)
+
+   {
+
+        sscanf(str, "%d %d %d", &result->a, &result->b, &result->c);
+
+  
+
+        return0;
+
+   }
+
+}
+
+核心的代码在parser.h中，主要通过模板和函数重载来完成一种编译期的多态行为。
+
+调用实例如下：
+
+#include "parser.h"
+
+#include <stdio.h>
+
+#include <iostream>
+
+usingnamespaceparse;
+
+ 
+
+char* test1 = "abcdef\t123\t3.9\t456\tyiyg\n";
+
+char* test2 = "abcdef\t3:4,5,6\t3.9\t456\tyiyg\t4:1,2,3,4\n";
+
+char* test3 = "abcdef\t123\t3.9\t456\tyiyg\t22 33 44\n";
+
+ 
+
+voidtest();
+
+ 
+
+voidtest()
+
+{
+
+   Parser test;
+
+   test.parse_line(test1, 5);
+
+   intx;
+
+   test.get_column(3, &x);
+
+   char* y = newchar[20];
+
+   test.get_column(4, y);
+
+   floatz;
+
+   test.get_column(2, &z);
+
+   printf("%d, %s, %f\n", x, y, z);
+
+   test.parse_line(test3, 6);
+
+  
+
+   MyStruct my_struct;
+
+   test.get_column(5, &my_struct);
+
+   printf("%d %d %d\n", my_struct.a, my_struct.b, my_struct.c);
+
+}
+
+逻辑相对比较清晰，就不过多解释了。

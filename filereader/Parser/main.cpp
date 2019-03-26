@@ -12,7 +12,7 @@ int main(int argc, char* argv[])
         cout << "Memory error!" << endl;
     }
 
-    pParser->run();
+    pParser->Run();
 
     if(NULL != pParser)
     {
