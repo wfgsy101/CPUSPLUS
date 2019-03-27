@@ -1,5 +1,3 @@
-//#pragma once
-
 #include<iostream>
 using namespace std;
 
@@ -8,15 +6,16 @@ class Parser
 public:
     Parser();
     ~Parser();
+    void Run(void);
+    
+protected:
     int Init(void);
     int Uninit(void);
-    void Run(void);
     void ConvertElement(char* element, int* num);
     void ConvertElement(char* element, char* cha);
     void Word_Split(char * word_list, int column_count, char ** word_points);
     int FileRead(FILE * file_fp, char* mem, int read_length);
     int GetFileLength(FILE * fp);
-protected:
 
 private:
     int COLUMN_COUNT;
