@@ -1,0 +1,43 @@
+#edit-mode: -*- python -*-
+#coding:utf-8
+
+WORKROOT('./')
+
+
+#gcc version, default 'gcc'
+COMPILER('gcc482')
+
+#Preprocessor flags.
+CPPFLAGS('-D__LINUX__ ')
+#CPPFLAGS(r'-DVERSION=\"%s\"' % REPO_REVISION())
+
+
+#C++ flags.
+CXXFLAGS('-g -std=c++11 -rdynamic -03')
+
+
+#-I path
+INCPATHS('$INC')
+INCPATHS('./WordParser')
+
+
+#link flags
+LDFLAGS('-lpthread' ) 
+
+#CONFIGS("baidu/base/ullib@master")
+CONFIGS("lib2-64/ullib@master")
+CONFIGS("thirdsrc/gtest@gtest_1-6-0-100_PD_BL")
+
+user_sources=GLOB("WordParser/*.cpp")
+
+
+#release files except headers
+OUTPUT('conf', '$OUT')
+
+#bin
+Application('WordParser', Sources(user_sources))
+
+
+
+
+
